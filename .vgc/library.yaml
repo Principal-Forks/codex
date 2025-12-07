@@ -1,0 +1,124 @@
+version: "1.0.0"
+name: "Codex Architecture Library"
+
+nodeComponents:
+  core:
+    name: "Core Services"
+    category: "service"
+    description: "Central business logic and orchestration"
+    icon: "🧠"
+
+  cli:
+    name: "CLI Interface"
+    category: "interface"
+    description: "Command-line interface and entry point"
+    icon: "💻"
+
+  tui:
+    name: "TUI"
+    category: "interface"
+    description: "Interactive terminal user interface"
+    icon: "🖥️"
+
+  exec:
+    name: "Exec Engine"
+    category: "service"
+    description: "Headless execution mode for automation"
+    icon: "⚙️"
+
+  mcp_server:
+    name: "MCP Server"
+    category: "service"
+    description: "Model Context Protocol server"
+    icon: "🔌"
+
+  app_server:
+    name: "App Server"
+    category: "service"
+    description: "JSON-RPC app server"
+    icon: "🌐"
+
+  protocol:
+    name: "Protocol"
+    category: "component"
+    description: "Communication protocols and data structures"
+    icon: "📡"
+
+  sandbox:
+    name: "Sandbox"
+    category: "security"
+    description: "Platform-specific execution sandbox"
+    icon: "🛡️"
+
+  model_client:
+    name: "Model Client"
+    category: "integration"
+    description: "AI model provider abstraction"
+    icon: "🤖"
+
+  tools:
+    name: "Tools"
+    category: "component"
+    description: "Built-in and external tool ecosystem"
+    icon: "🔧"
+
+  config:
+    name: "Configuration"
+    category: "component"
+    description: "Configuration management and profiles"
+    icon: "⚙️"
+
+  auth:
+    name: "Authentication"
+    category: "security"
+    description: "Authentication and authorization"
+    icon: "🔐"
+
+  telemetry:
+    name: "Telemetry"
+    category: "observability"
+    description: "OpenTelemetry and logging"
+    icon: "📊"
+
+  sdk:
+    name: "TypeScript SDK"
+    category: "interface"
+    description: "Programmatic interface for embedding"
+    icon: "📦"
+
+  shell_tool_mcp:
+    name: "Shell Tool MCP"
+    category: "integration"
+    description: "Enhanced shell execution server"
+    icon: "🐚"
+
+edgeComponents:
+  data_flow:
+    name: "Data Flow"
+    description: "Data flows between components"
+    style: "solid"
+    color: "#2563eb"
+
+  control_flow:
+    name: "Control Flow"
+    description: "Control and orchestration signals"
+    style: "dashed"
+    color: "#7c3aed"
+
+  api_call:
+    name: "API Call"
+    description: "External API communication"
+    style: "solid"
+    color: "#dc2626"
+
+  event_stream:
+    name: "Event Stream"
+    description: "Real-time event streaming"
+    style: "dotted"
+    color: "#059669"
+
+  config_dependency:
+    name: "Config Dependency"
+    description: "Configuration dependency"
+    style: "dashed"
+    color: "#ea580c"

@@ -1,0 +1,295 @@
+{
+  "vv": {
+    "name": "Codex Architecture",
+    "version": "1.0.0"
+  },
+  "nodes": [
+    {
+      "id": "cli",
+      "type": "text",
+      "x": 10,
+      "y": 147,
+      "width": 120,
+      "height": 60,
+      "text": "CLI Interface",
+      "vv": {
+        "nodeType": "cli",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "tui",
+      "type": "text",
+      "x": 191,
+      "y": 147,
+      "width": 120,
+      "height": 60,
+      "text": "TUI",
+      "vv": {
+        "nodeType": "tui",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "exec",
+      "type": "text",
+      "x": 429,
+      "y": 147,
+      "width": 120,
+      "height": 60,
+      "text": "Exec Engine",
+      "vv": {
+        "nodeType": "exec",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "core",
+      "type": "text",
+      "x": 321,
+      "y": 275,
+      "width": 120,
+      "height": 60,
+      "text": "Core Services",
+      "vv": {
+        "nodeType": "core",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "config",
+      "type": "text",
+      "x": 124,
+      "y": 455,
+      "width": 120,
+      "height": 60,
+      "text": "Configuration",
+      "vv": {
+        "nodeType": "config",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "auth",
+      "type": "text",
+      "x": 502,
+      "y": 364,
+      "width": 120,
+      "height": 60,
+      "text": "Authentication",
+      "vv": {
+        "nodeType": "auth",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "model_client",
+      "type": "text",
+      "x": 671,
+      "y": 313,
+      "width": 120,
+      "height": 60,
+      "text": "Model Client",
+      "vv": {
+        "nodeType": "model_client",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "tools",
+      "type": "text",
+      "x": 293,
+      "y": 455,
+      "width": 120,
+      "height": 60,
+      "text": "Tools",
+      "vv": {
+        "nodeType": "tools",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "sandbox",
+      "type": "text",
+      "x": 295,
+      "y": 575,
+      "width": 120,
+      "height": 60,
+      "text": "Sandbox",
+      "vv": {
+        "nodeType": "sandbox",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "protocol",
+      "type": "text",
+      "x": 538,
+      "y": 538,
+      "width": 120,
+      "height": 60,
+      "text": "Protocol",
+      "vv": {
+        "nodeType": "protocol",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "mcp_server",
+      "type": "text",
+      "x": 621,
+      "y": 642,
+      "width": 120,
+      "height": 60,
+      "text": "MCP Server",
+      "vv": {
+        "nodeType": "mcp_server",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "app_server",
+      "type": "text",
+      "x": 450,
+      "y": 639,
+      "width": 120,
+      "height": 60,
+      "text": "App Server",
+      "vv": {
+        "nodeType": "app_server",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "telemetry",
+      "type": "text",
+      "x": -52,
+      "y": 457,
+      "width": 120,
+      "height": 60,
+      "text": "Telemetry",
+      "vv": {
+        "nodeType": "telemetry",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "sdk",
+      "type": "text",
+      "x": 616,
+      "y": 149,
+      "width": 120,
+      "height": 60,
+      "text": "TypeScript SDK",
+      "vv": {
+        "nodeType": "sdk",
+        "shape": "rectangle"
+      }
+    },
+    {
+      "id": "shell_tool_mcp",
+      "type": "text",
+      "x": 615,
+      "y": 768,
+      "width": 120,
+      "height": 60,
+      "text": "Shell Tool MCP",
+      "vv": {
+        "nodeType": "shell_tool_mcp",
+        "shape": "rectangle"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "cli_to_core",
+      "fromNode": "cli",
+      "toNode": "core",
+      "type": "control_flow"
+    },
+    {
+      "id": "tui_to_core",
+      "fromNode": "tui",
+      "toNode": "core",
+      "type": "control_flow"
+    },
+    {
+      "id": "exec_to_core",
+      "fromNode": "exec",
+      "toNode": "core",
+      "type": "control_flow"
+    },
+    {
+      "id": "sdk_to_core",
+      "fromNode": "sdk",
+      "toNode": "core",
+      "type": "control_flow"
+    },
+    {
+      "id": "core_to_config",
+      "fromNode": "core",
+      "toNode": "config",
+      "type": "config_dependency"
+    },
+    {
+      "id": "core_to_auth",
+      "fromNode": "core",
+      "toNode": "auth",
+      "type": "control_flow"
+    },
+    {
+      "id": "auth_to_model_client",
+      "fromNode": "auth",
+      "toNode": "model_client",
+      "type": "api_call"
+    },
+    {
+      "id": "core_to_tools",
+      "fromNode": "core",
+      "toNode": "tools",
+      "type": "control_flow"
+    },
+    {
+      "id": "tools_to_sandbox",
+      "fromNode": "tools",
+      "toNode": "sandbox",
+      "type": "data_flow"
+    },
+    {
+      "id": "core_to_protocol",
+      "fromNode": "core",
+      "toNode": "protocol",
+      "type": "data_flow"
+    },
+    {
+      "id": "protocol_to_mcp_server",
+      "fromNode": "protocol",
+      "toNode": "mcp_server",
+      "type": "event_stream"
+    },
+    {
+      "id": "protocol_to_app_server",
+      "fromNode": "protocol",
+      "toNode": "app_server",
+      "type": "event_stream"
+    },
+    {
+      "id": "mcp_server_to_shell_tool",
+      "fromNode": "mcp_server",
+      "toNode": "shell_tool_mcp",
+      "type": "api_call"
+    },
+    {
+      "id": "core_to_telemetry",
+      "fromNode": "core",
+      "toNode": "telemetry",
+      "type": "event_stream"
+    },
+    {
+      "id": "model_client_to_core",
+      "fromNode": "model_client",
+      "toNode": "core",
+      "type": "event_stream"
+    }
+  ]
+}
