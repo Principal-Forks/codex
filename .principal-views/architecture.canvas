@@ -1,5 +1,5 @@
 {
-  "vv": {
+  "pv": {
     "name": "Codex Architecture",
     "version": "1.0.0"
   },
@@ -12,9 +12,10 @@
       "width": 120,
       "height": 60,
       "text": "CLI Interface",
-      "vv": {
+      "pv": {
         "nodeType": "cli",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "green"
       }
     },
     {
@@ -25,9 +26,10 @@
       "width": 120,
       "height": 60,
       "text": "TUI",
-      "vv": {
+      "pv": {
         "nodeType": "tui",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "blue"
       }
     },
     {
@@ -38,9 +40,10 @@
       "width": 120,
       "height": 60,
       "text": "Exec Engine",
-      "vv": {
+      "pv": {
         "nodeType": "exec",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "orange"
       }
     },
     {
@@ -51,9 +54,10 @@
       "width": 120,
       "height": 60,
       "text": "Core Services",
-      "vv": {
+      "pv": {
         "nodeType": "core",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "purple"
       }
     },
     {
@@ -64,9 +68,10 @@
       "width": 120,
       "height": 60,
       "text": "Configuration",
-      "vv": {
+      "pv": {
         "nodeType": "config",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "grey"
       }
     },
     {
@@ -77,9 +82,10 @@
       "width": 120,
       "height": 60,
       "text": "Authentication",
-      "vv": {
+      "pv": {
         "nodeType": "auth",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "red"
       }
     },
     {
@@ -90,9 +96,10 @@
       "width": 120,
       "height": 60,
       "text": "Model Client",
-      "vv": {
+      "pv": {
         "nodeType": "model_client",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "cyan"
       }
     },
     {
@@ -103,9 +110,10 @@
       "width": 120,
       "height": 60,
       "text": "Tools",
-      "vv": {
+      "pv": {
         "nodeType": "tools",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "brown"
       }
     },
     {
@@ -116,9 +124,10 @@
       "width": 120,
       "height": 60,
       "text": "Sandbox",
-      "vv": {
+"pv": {
         "nodeType": "sandbox",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "deep orange"
       }
     },
     {
@@ -129,9 +138,10 @@
       "width": 120,
       "height": 60,
       "text": "Protocol",
-      "vv": {
+      "pv": {
         "nodeType": "protocol",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "indigo"
       }
     },
     {
@@ -142,9 +152,10 @@
       "width": 120,
       "height": 60,
       "text": "MCP Server",
-      "vv": {
+      "pv": {
         "nodeType": "mcp_server",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "pink"
       }
     },
     {
@@ -155,9 +166,10 @@
       "width": 120,
       "height": 60,
       "text": "App Server",
-      "vv": {
+"pv": {
         "nodeType": "app_server",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "teal"
       }
     },
     {
@@ -168,9 +180,10 @@
       "width": 120,
       "height": 60,
       "text": "Telemetry",
-      "vv": {
+"pv": {
         "nodeType": "telemetry",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "lime"
       }
     },
     {
@@ -181,9 +194,10 @@
       "width": 120,
       "height": 60,
       "text": "TypeScript SDK",
-      "vv": {
+      "pv": {
         "nodeType": "sdk",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "yellow"
       }
     },
     {
@@ -194,9 +208,10 @@
       "width": 120,
       "height": 60,
       "text": "Shell Tool MCP",
-      "vv": {
+"pv": {
         "nodeType": "shell_tool_mcp",
-        "shape": "rectangle"
+        "shape": "rectangle",
+      "fill": "light green"
       }
     }
   ],
@@ -205,91 +220,91 @@
       "id": "cli_to_core",
       "fromNode": "cli",
       "toNode": "core",
-      "type": "control_flow"
+      "color": "#7c3aed"
     },
     {
       "id": "tui_to_core",
       "fromNode": "tui",
       "toNode": "core",
-      "type": "control_flow"
+      "color": "#7c3aed"
     },
     {
       "id": "exec_to_core",
       "fromNode": "exec",
       "toNode": "core",
-      "type": "control_flow"
+      "color": "#7c3aed"
     },
     {
       "id": "sdk_to_core",
       "fromNode": "sdk",
       "toNode": "core",
-      "type": "control_flow"
+      "color": "#7c3aed"
     },
     {
       "id": "core_to_config",
       "fromNode": "core",
       "toNode": "config",
-      "type": "config_dependency"
+      "color": "#ea580c"
     },
     {
       "id": "core_to_auth",
       "fromNode": "core",
       "toNode": "auth",
-      "type": "control_flow"
+      "color": "#7c3aed"
     },
     {
       "id": "auth_to_model_client",
       "fromNode": "auth",
       "toNode": "model_client",
-      "type": "api_call"
+      "color": "#dc2626"
     },
     {
       "id": "core_to_tools",
       "fromNode": "core",
       "toNode": "tools",
-      "type": "control_flow"
+      "color": "#7c3aed"
     },
     {
       "id": "tools_to_sandbox",
       "fromNode": "tools",
       "toNode": "sandbox",
-      "type": "data_flow"
+      "color": "#2563eb"
     },
     {
       "id": "core_to_protocol",
       "fromNode": "core",
       "toNode": "protocol",
-      "type": "data_flow"
+      "color": "#2563eb"
     },
     {
       "id": "protocol_to_mcp_server",
       "fromNode": "protocol",
       "toNode": "mcp_server",
-      "type": "event_stream"
+      "color": "#059669"
     },
     {
       "id": "protocol_to_app_server",
       "fromNode": "protocol",
       "toNode": "app_server",
-      "type": "event_stream"
+      "color": "#059669"
     },
     {
       "id": "mcp_server_to_shell_tool",
       "fromNode": "mcp_server",
       "toNode": "shell_tool_mcp",
-      "type": "api_call"
+      "color": "#dc2626"
     },
     {
       "id": "core_to_telemetry",
       "fromNode": "core",
       "toNode": "telemetry",
-      "type": "event_stream"
+      "color": "#059669"
     },
     {
       "id": "model_client_to_core",
       "fromNode": "model_client",
       "toNode": "core",
-      "type": "event_stream"
+      "color": "#059669"
     }
   ]
 }
