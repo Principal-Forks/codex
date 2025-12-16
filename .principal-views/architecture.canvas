@@ -219,91 +219,121 @@
     {
       "id": "cli_to_core",
       "fromNode": "cli",
+      "fromSide": "bottom",
       "toNode": "core",
+      "toSide": "top",
       "color": "#7c3aed"
     },
     {
       "id": "tui_to_core",
       "fromNode": "tui",
+      "fromSide": "bottom",
       "toNode": "core",
+      "toSide": "left",
       "color": "#7c3aed"
     },
     {
       "id": "exec_to_core",
       "fromNode": "exec",
+      "fromSide": "bottom",
       "toNode": "core",
+      "toSide": "right",
       "color": "#7c3aed"
     },
     {
       "id": "sdk_to_core",
       "fromNode": "sdk",
+      "fromSide": "bottom",
       "toNode": "core",
+      "toSide": "right",
       "color": "#7c3aed"
     },
     {
       "id": "core_to_config",
       "fromNode": "core",
+      "fromSide": "bottom",
       "toNode": "config",
+      "toSide": "top",
       "color": "#ea580c"
     },
     {
       "id": "core_to_auth",
       "fromNode": "core",
+      "fromSide": "bottom",
       "toNode": "auth",
+      "toSide": "top",
       "color": "#7c3aed"
     },
     {
       "id": "auth_to_model_client",
       "fromNode": "auth",
+      "fromSide": "right",
       "toNode": "model_client",
+      "toSide": "left",
       "color": "#dc2626"
     },
     {
       "id": "core_to_tools",
       "fromNode": "core",
+      "fromSide": "bottom",
       "toNode": "tools",
+      "toSide": "top",
       "color": "#7c3aed"
     },
     {
       "id": "tools_to_sandbox",
       "fromNode": "tools",
+      "fromSide": "bottom",
       "toNode": "sandbox",
+      "toSide": "top",
       "color": "#2563eb"
     },
     {
       "id": "core_to_protocol",
       "fromNode": "core",
+      "fromSide": "right",
       "toNode": "protocol",
+      "toSide": "left",
       "color": "#2563eb"
     },
     {
       "id": "protocol_to_mcp_server",
       "fromNode": "protocol",
+      "fromSide": "bottom",
       "toNode": "mcp_server",
+      "toSide": "top",
       "color": "#059669"
     },
     {
       "id": "protocol_to_app_server",
       "fromNode": "protocol",
+      "fromSide": "bottom",
       "toNode": "app_server",
+      "toSide": "top",
       "color": "#059669"
     },
     {
       "id": "mcp_server_to_shell_tool",
       "fromNode": "mcp_server",
+      "fromSide": "bottom",
       "toNode": "shell_tool_mcp",
+      "toSide": "top",
       "color": "#dc2626"
     },
     {
       "id": "core_to_telemetry",
       "fromNode": "core",
+      "fromSide": "left",
       "toNode": "telemetry",
+      "toSide": "right",
       "color": "#059669"
     },
     {
       "id": "model_client_to_core",
       "fromNode": "model_client",
+      "fromSide": "bottom",
       "toNode": "core",
+      "toSide": "right",
       "color": "#059669"
     }
   ]
