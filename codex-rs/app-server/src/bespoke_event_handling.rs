@@ -15,9 +15,11 @@ use codex_app_server_protocol::CommandExecutionRequestApprovalParams;
 use codex_app_server_protocol::CommandExecutionRequestApprovalResponse;
 use codex_app_server_protocol::CommandExecutionStatus;
 use codex_app_server_protocol::ContextCompactedNotification;
+use codex_app_server_protocol::DeprecationNoticeNotification;
 use codex_app_server_protocol::ErrorNotification;
 use codex_app_server_protocol::ExecCommandApprovalParams;
 use codex_app_server_protocol::ExecCommandApprovalResponse;
+use codex_app_server_protocol::ExecPolicyAmendment as V2ExecPolicyAmendment;
 use codex_app_server_protocol::FileChangeOutputDeltaNotification;
 use codex_app_server_protocol::FileChangeRequestApprovalParams;
 use codex_app_server_protocol::FileChangeRequestApprovalResponse;
@@ -30,12 +32,13 @@ use codex_app_server_protocol::McpToolCallResult;
 use codex_app_server_protocol::McpToolCallStatus;
 use codex_app_server_protocol::PatchApplyStatus;
 use codex_app_server_protocol::PatchChangeKind as V2PatchChangeKind;
+use codex_app_server_protocol::RawResponseItemCompletedNotification;
 use codex_app_server_protocol::ReasoningSummaryPartAddedNotification;
 use codex_app_server_protocol::ReasoningSummaryTextDeltaNotification;
 use codex_app_server_protocol::ReasoningTextDeltaNotification;
-use codex_app_server_protocol::SandboxCommandAssessment as V2SandboxCommandAssessment;
 use codex_app_server_protocol::ServerNotification;
 use codex_app_server_protocol::ServerRequestPayload;
+use codex_app_server_protocol::TerminalInteractionNotification;
 use codex_app_server_protocol::ThreadItem;
 use codex_app_server_protocol::ThreadTokenUsage;
 use codex_app_server_protocol::ThreadTokenUsageUpdatedNotification;
@@ -178,8 +181,7 @@ pub(crate) async fn apply_bespoke_event_handling(
             command,
             cwd,
             reason,
-            risk,
-            proposed_execpolicy_amendment: _,
+            proposed_execpolicy_amendment,
             parsed_cmd,
         }) => match api_version {
             ApiVersion::V1 => {
@@ -189,7 +191,6 @@ pub(crate) async fn apply_bespoke_event_handling(
                     command,
                     cwd,
                     reason,
-                    risk,
                     parsed_cmd,
                 };
                 let rx = outgoing
@@ -207,6 +208,8 @@ pub(crate) async fn apply_bespoke_event_handling(
                     .map(V2ParsedCommand::from)
                     .collect::<Vec<_>>();
                 let command_string = shlex_join(&command);
+                let proposed_execpolicy_amendment_v2 =
+                    proposed_execpolicy_amendment.map(V2ExecPolicyAmendment::from);
 
                 let params = CommandExecutionRequestApprovalParams {
                     thread_id: conversation_id.to_string(),
@@ -215,7 +218,7 @@ pub(crate) async fn apply_bespoke_event_handling(
                     // and emit the corresponding EventMsg, we repurpose the call_id as the item_id.
                     item_id: item_id.clone(),
                     reason,
-                    risk: risk.map(V2SandboxCommandAssessment::from),
+                    proposed_execpolicy_amendment: proposed_execpolicy_amendment_v2,
                 };
                 let rx = outgoing
                     .send_request(ServerRequestPayload::CommandExecutionRequestApproval(
@@ -281,6 +284,15 @@ pub(crate) async fn apply_bespoke_event_handling(
                 .send_server_notification(ServerNotification::ContextCompacted(notification))
                 .await;
         }
+        EventMsg::DeprecationNotice(event) => {
+            let notification = DeprecationNoticeNotification {
+                summary: event.summary,
+                details: event.details,
+            };
+            outgoing
+                .send_server_notification(ServerNotification::DeprecationNotice(notification))
+                .await;
+        }
         EventMsg::ReasoningContentDelta(event) => {
             let notification = ReasoningSummaryTextDeltaNotification {
                 thread_id: conversation_id.to_string(),
@@ -328,6 +340,7 @@ pub(crate) async fn apply_bespoke_event_handling(
             let turn_error = TurnError {
                 message: ev.message,
                 codex_error_info: ev.codex_error_info.map(V2CodexErrorInfo::from),
+                additional_details: None,
             };
             handle_error(conversation_id, turn_error.clone(), &turn_summary_store).await;
             outgoing
@@ -345,6 +358,7 @@ pub(crate) async fn apply_bespoke_event_handling(
             let turn_error = TurnError {
                 message: ev.message,
                 codex_error_info: ev.codex_error_info.map(V2CodexErrorInfo::from),
+                additional_details: ev.additional_details,
             };
             outgoing
                 .send_server_notification(ServerNotification::Error(ErrorNotification {
@@ -449,6 +463,16 @@ pub(crate) async fn apply_bespoke_event_handling(
             outgoing
                 .send_server_notification(ServerNotification::ItemCompleted(completed))
                 .await;
+        }
+        EventMsg::RawResponseItem(raw_response_item_event) => {
+            maybe_emit_raw_response_item_completed(
+                api_version,
+                conversation_id,
+                &event_turn_id,
+                raw_response_item_event.item,
+                outgoing.as_ref(),
+            )
+            .await;
         }
         EventMsg::PatchApplyBegin(patch_begin_event) => {
             // Until we migrate the core to be aware of a first class FileChangeItem
@@ -568,6 +592,20 @@ pub(crate) async fn apply_bespoke_event_handling(
                     ))
                     .await;
             }
+        }
+        EventMsg::TerminalInteraction(terminal_event) => {
+            let item_id = terminal_event.call_id.clone();
+
+            let notification = TerminalInteractionNotification {
+                thread_id: conversation_id.to_string(),
+                turn_id: event_turn_id.clone(),
+                item_id,
+                process_id: terminal_event.process_id,
+                stdin: terminal_event.stdin,
+            };
+            outgoing
+                .send_server_notification(ServerNotification::TerminalInteraction(notification))
+                .await;
         }
         EventMsg::ExecCommandEnd(exec_command_end_event) => {
             let ExecCommandEndEvent {
@@ -802,6 +840,27 @@ async fn complete_command_execution_item(
     };
     outgoing
         .send_server_notification(ServerNotification::ItemCompleted(notification))
+        .await;
+}
+
+async fn maybe_emit_raw_response_item_completed(
+    api_version: ApiVersion,
+    conversation_id: ConversationId,
+    turn_id: &str,
+    item: codex_protocol::models::ResponseItem,
+    outgoing: &OutgoingMessageSender,
+) {
+    let ApiVersion::V2 = api_version else {
+        return;
+    };
+
+    let notification = RawResponseItemCompletedNotification {
+        thread_id: conversation_id.to_string(),
+        turn_id: turn_id.to_string(),
+        item,
+    };
+    outgoing
+        .send_server_notification(ServerNotification::RawResponseItemCompleted(notification))
         .await;
 }
 
@@ -1047,7 +1106,11 @@ async fn on_file_change_request_approval_response(
                 });
 
             let (decision, completion_status) = match response.decision {
-                ApprovalDecision::Accept => (ReviewDecision::Approved, None),
+                ApprovalDecision::Accept
+                | ApprovalDecision::AcceptForSession
+                | ApprovalDecision::AcceptWithExecpolicyAmendment { .. } => {
+                    (ReviewDecision::Approved, None)
+                }
                 ApprovalDecision::Decline => {
                     (ReviewDecision::Denied, Some(PatchApplyStatus::Declined))
                 }
@@ -1109,25 +1172,27 @@ async fn on_command_execution_request_approval_response(
                     error!("failed to deserialize CommandExecutionRequestApprovalResponse: {err}");
                     CommandExecutionRequestApprovalResponse {
                         decision: ApprovalDecision::Decline,
-                        accept_settings: None,
                     }
                 });
 
-            let CommandExecutionRequestApprovalResponse {
-                decision,
-                accept_settings,
-            } = response;
+            let decision = response.decision;
 
-            let (decision, completion_status) = match (decision, accept_settings) {
-                (ApprovalDecision::Accept, Some(settings)) if settings.for_session => {
-                    (ReviewDecision::ApprovedForSession, None)
-                }
-                (ApprovalDecision::Accept, _) => (ReviewDecision::Approved, None),
-                (ApprovalDecision::Decline, _) => (
+            let (decision, completion_status) = match decision {
+                ApprovalDecision::Accept => (ReviewDecision::Approved, None),
+                ApprovalDecision::AcceptForSession => (ReviewDecision::ApprovedForSession, None),
+                ApprovalDecision::AcceptWithExecpolicyAmendment {
+                    execpolicy_amendment,
+                } => (
+                    ReviewDecision::ApprovedExecpolicyAmendment {
+                        proposed_execpolicy_amendment: execpolicy_amendment.into_core(),
+                    },
+                    None,
+                ),
+                ApprovalDecision::Decline => (
                     ReviewDecision::Denied,
                     Some(CommandExecutionStatus::Declined),
                 ),
-                (ApprovalDecision::Cancel, _) => (
+                ApprovalDecision::Cancel => (
                     ReviewDecision::Abort,
                     Some(CommandExecutionStatus::Declined),
                 ),
@@ -1189,7 +1254,7 @@ async fn construct_mcp_tool_call_notification(
     }
 }
 
-/// simiilar to handle_mcp_tool_call_end in exec
+/// similar to handle_mcp_tool_call_end in exec
 async fn construct_mcp_tool_call_end_notification(
     end_event: McpToolCallEndEvent,
     thread_id: String,
@@ -1277,6 +1342,7 @@ mod tests {
             TurnError {
                 message: "boom".to_string(),
                 codex_error_info: Some(V2CodexErrorInfo::InternalServerError),
+                additional_details: None,
             },
             &turn_summary_store,
         )
@@ -1288,6 +1354,7 @@ mod tests {
             Some(TurnError {
                 message: "boom".to_string(),
                 codex_error_info: Some(V2CodexErrorInfo::InternalServerError),
+                additional_details: None,
             })
         );
         Ok(())
@@ -1335,6 +1402,7 @@ mod tests {
             TurnError {
                 message: "oops".to_string(),
                 codex_error_info: None,
+                additional_details: None,
             },
             &turn_summary_store,
         )
@@ -1376,6 +1444,7 @@ mod tests {
             TurnError {
                 message: "bad".to_string(),
                 codex_error_info: Some(V2CodexErrorInfo::Other),
+                additional_details: None,
             },
             &turn_summary_store,
         )
@@ -1404,6 +1473,7 @@ mod tests {
                     Some(TurnError {
                         message: "bad".to_string(),
                         codex_error_info: Some(V2CodexErrorInfo::Other),
+                        additional_details: None,
                     })
                 );
             }
@@ -1628,6 +1698,7 @@ mod tests {
             TurnError {
                 message: "a1".to_string(),
                 codex_error_info: Some(V2CodexErrorInfo::BadRequest),
+                additional_details: None,
             },
             &turn_summary_store,
         )
@@ -1647,6 +1718,7 @@ mod tests {
             TurnError {
                 message: "b1".to_string(),
                 codex_error_info: None,
+                additional_details: None,
             },
             &turn_summary_store,
         )
@@ -1683,6 +1755,7 @@ mod tests {
                     Some(TurnError {
                         message: "a1".to_string(),
                         codex_error_info: Some(V2CodexErrorInfo::BadRequest),
+                        additional_details: None,
                     })
                 );
             }
@@ -1703,6 +1776,7 @@ mod tests {
                     Some(TurnError {
                         message: "b1".to_string(),
                         codex_error_info: None,
+                        additional_details: None,
                     })
                 );
             }

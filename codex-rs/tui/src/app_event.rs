@@ -10,6 +10,7 @@ use codex_protocol::openai_models::ModelPreset;
 use crate::bottom_pane::ApprovalRequest;
 use crate::history_cell::HistoryCell;
 
+use codex_core::features::Feature;
 use codex_core::protocol::AskForApproval;
 use codex_core::protocol::SandboxPolicy;
 use codex_protocol::openai_models::ReasoningEffort;
@@ -74,6 +75,11 @@ pub(crate) enum AppEvent {
         model: ModelPreset,
     },
 
+    /// Open the full model picker (non-auto models).
+    OpenAllModelsPopup {
+        models: Vec<ModelPreset>,
+    },
+
     /// Open the confirmation prompt before enabling full access mode.
     OpenFullAccessConfirmation {
         preset: ApprovalPreset,
@@ -112,6 +118,11 @@ pub(crate) enum AppEvent {
     /// Update the current sandbox policy in the running app and widget.
     UpdateSandboxPolicy(SandboxPolicy),
 
+    /// Update feature flags and persist them to the top-level config.
+    UpdateFeatureFlags {
+        updates: Vec<(Feature, bool)>,
+    },
+
     /// Update whether the full access warning prompt has been acknowledged.
     UpdateFullAccessWarningAcknowledged(bool),
 
@@ -134,7 +145,8 @@ pub(crate) enum AppEvent {
 
     /// Persist the acknowledgement flag for the model migration prompt.
     PersistModelMigrationPromptAcknowledged {
-        migration_config: String,
+        from_model: String,
+        to_model: String,
     },
 
     /// Skip the next world-writable scan (one-shot) after a user-confirmed continue.
@@ -169,6 +181,9 @@ pub(crate) enum AppEvent {
     OpenFeedbackConsent {
         category: FeedbackCategory,
     },
+
+    /// Launch the external editor after a normal draw has completed.
+    LaunchExternalEditor,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

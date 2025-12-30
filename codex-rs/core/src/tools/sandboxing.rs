@@ -7,7 +7,6 @@
 use crate::codex::Session;
 use crate::codex::TurnContext;
 use crate::error::CodexErr;
-use crate::protocol::SandboxCommandAssessment;
 use crate::protocol::SandboxPolicy;
 use crate::sandboxing::CommandSpec;
 use crate::sandboxing::SandboxManager;
@@ -20,7 +19,6 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::path::Path;
-use std::path::PathBuf;
 
 use futures::Future;
 use futures::future::BoxFuture;
@@ -84,7 +82,6 @@ pub(crate) struct ApprovalCtx<'a> {
     pub turn: &'a TurnContext,
     pub call_id: &'a str,
     pub retry_reason: Option<String>,
-    pub risk: Option<SandboxCommandAssessment>,
 }
 
 // Specifies what tool orchestrator should do with a given tool call.
@@ -95,6 +92,9 @@ pub(crate) enum ExecApprovalRequirement {
         /// The first attempt should skip sandboxing (e.g., when explicitly
         /// greenlit by policy).
         bypass_sandbox: bool,
+        /// Proposed execpolicy amendment to skip future approvals for similar commands
+        /// Only applies if the command fails to run in sandbox and codex prompts the user to run outside the sandbox.
+        proposed_execpolicy_amendment: Option<ExecPolicyAmendment>,
     },
     /// Approval required for this tool call.
     NeedsApproval {
@@ -114,6 +114,10 @@ impl ExecApprovalRequirement {
                 proposed_execpolicy_amendment: Some(prefix),
                 ..
             } => Some(prefix),
+            Self::Skip {
+                proposed_execpolicy_amendment: Some(prefix),
+                ..
+            } => Some(prefix),
             _ => None,
         }
     }
@@ -128,7 +132,10 @@ pub(crate) fn default_exec_approval_requirement(
 ) -> ExecApprovalRequirement {
     let needs_approval = match policy {
         AskForApproval::Never | AskForApproval::OnFailure => false,
-        AskForApproval::OnRequest => !matches!(sandbox_policy, SandboxPolicy::DangerFullAccess),
+        AskForApproval::OnRequest => !matches!(
+            sandbox_policy,
+            SandboxPolicy::DangerFullAccess | SandboxPolicy::ExternalSandbox { .. }
+        ),
         AskForApproval::UnlessTrusted => true,
     };
 
@@ -140,6 +147,7 @@ pub(crate) fn default_exec_approval_requirement(
     } else {
         ExecApprovalRequirement::Skip {
             bypass_sandbox: false,
+            proposed_execpolicy_amendment: None,
         }
     }
 }
@@ -211,17 +219,6 @@ pub(crate) struct ToolCtx<'a> {
     pub tool_name: String,
 }
 
-/// Captures the command metadata needed to re-run a tool request without sandboxing.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct SandboxRetryData {
-    pub command: Vec<String>,
-    pub cwd: PathBuf,
-}
-
-pub(crate) trait ProvidesSandboxRetryData {
-    fn sandbox_retry_data(&self) -> Option<SandboxRetryData>;
-}
-
 #[derive(Debug)]
 pub(crate) enum ToolError {
     Rejected(String),
@@ -257,5 +254,39 @@ impl<'a> SandboxAttempt<'a> {
             self.sandbox_cwd,
             self.codex_linux_sandbox_exe,
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use codex_protocol::protocol::NetworkAccess;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn external_sandbox_skips_exec_approval_on_request() {
+        assert_eq!(
+            default_exec_approval_requirement(
+                AskForApproval::OnRequest,
+                &SandboxPolicy::ExternalSandbox {
+                    network_access: NetworkAccess::Restricted,
+                },
+            ),
+            ExecApprovalRequirement::Skip {
+                bypass_sandbox: false,
+                proposed_execpolicy_amendment: None,
+            }
+        );
+    }
+
+    #[test]
+    fn restricted_sandbox_requires_exec_approval_on_request() {
+        assert_eq!(
+            default_exec_approval_requirement(AskForApproval::OnRequest, &SandboxPolicy::ReadOnly),
+            ExecApprovalRequirement::NeedsApproval {
+                reason: None,
+                proposed_execpolicy_amendment: None,
+            }
+        );
     }
 }
