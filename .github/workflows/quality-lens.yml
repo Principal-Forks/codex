@@ -34,6 +34,17 @@ jobs:
       - name: Install Quality Lens CLI
         run: npm install -g @principal-ai/quality-lens-cli
 
+      - name: Debug - Check codex-rs presence
+        run: |
+          echo "=== Top level ==="
+          ls -la
+          echo "=== codex-rs contents ==="
+          ls -la codex-rs/ | head -20
+          echo "=== Cargo.toml count ==="
+          find . -name "Cargo.toml" -not -path "./node_modules/*" | wc -l
+          echo "=== Sample Cargo.toml paths ==="
+          find . -name "Cargo.toml" -not -path "./node_modules/*" | head -10
+
       - name: Run quality lenses
         run: quality-lens run . --output results.json --format json
 
