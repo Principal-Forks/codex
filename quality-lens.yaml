@@ -1,24 +1,23 @@
 # Quality Lens Configuration for Codex
-# Mixed TypeScript + Rust monorepo (Rust lenses not yet supported)
+# Mixed TypeScript + Rust monorepo
 
 lenses:
-  # Linting - ESLint with JSON format
+  # TypeScript/JavaScript lenses
   eslint: pnpm exec eslint . --format json
-
-  # Type checking - tsc with listFiles for file metrics
   typescript: pnpm exec tsc --noEmit --listFiles
-
-  # Formatting - Prettier check (flags auto-added by CLI)
   prettier: pnpm exec prettier --check .
-
-  # Testing - Jest with JSON reporter and coverage
   jest: pnpm exec jest --json --coverage
 
-# Exclude Rust crate, CLI, build outputs, and docs
+  # Rust lenses (using manifest-path for codex-rs workspace)
+  clippy: cargo clippy --manifest-path codex-rs/Cargo.toml --workspace --all-features --message-format json -- -D warnings
+  rustfmt: cargo fmt --manifest-path codex-rs/Cargo.toml --all --check
+  cargo-test: cargo nextest run --manifest-path codex-rs/Cargo.toml --workspace --message-format libtest-json
+
+# Exclude CLI, build outputs, and docs
 exclude:
-  - "codex-rs/**"
   - "codex-cli/**"
   - "**/dist/**"
   - "**/bin/**"
   - "**/node_modules/**"
+  - "**/target/**"
   - "docs/**"
