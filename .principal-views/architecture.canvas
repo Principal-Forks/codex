@@ -222,7 +222,8 @@
       "fromSide": "bottom",
       "toNode": "core",
       "toSide": "top",
-      "color": "#7c3aed"
+      "color": "#7c3aed",
+      "pv": { "edgeType": "control_flow" }
     },
     {
       "id": "tui_to_core",
@@ -230,7 +231,8 @@
       "fromSide": "bottom",
       "toNode": "core",
       "toSide": "left",
-      "color": "#7c3aed"
+      "color": "#7c3aed",
+      "pv": { "edgeType": "control_flow" }
     },
     {
       "id": "exec_to_core",
@@ -238,7 +240,8 @@
       "fromSide": "bottom",
       "toNode": "core",
       "toSide": "right",
-      "color": "#7c3aed"
+      "color": "#7c3aed",
+      "pv": { "edgeType": "control_flow" }
     },
     {
       "id": "sdk_to_core",
@@ -246,7 +249,8 @@
       "fromSide": "bottom",
       "toNode": "core",
       "toSide": "right",
-      "color": "#7c3aed"
+      "color": "#7c3aed",
+      "pv": { "edgeType": "control_flow" }
     },
     {
       "id": "core_to_config",
@@ -254,7 +258,8 @@
       "fromSide": "bottom",
       "toNode": "config",
       "toSide": "top",
-      "color": "#ea580c"
+      "color": "#ea580c",
+      "pv": { "edgeType": "config_dependency" }
     },
     {
       "id": "core_to_auth",
@@ -262,7 +267,8 @@
       "fromSide": "bottom",
       "toNode": "auth",
       "toSide": "top",
-      "color": "#7c3aed"
+      "color": "#7c3aed",
+      "pv": { "edgeType": "control_flow" }
     },
     {
       "id": "auth_to_model_client",
@@ -270,7 +276,8 @@
       "fromSide": "right",
       "toNode": "model_client",
       "toSide": "left",
-      "color": "#dc2626"
+      "color": "#dc2626",
+      "pv": { "edgeType": "api_call" }
     },
     {
       "id": "core_to_tools",
@@ -278,7 +285,8 @@
       "fromSide": "bottom",
       "toNode": "tools",
       "toSide": "top",
-      "color": "#7c3aed"
+      "color": "#7c3aed",
+      "pv": { "edgeType": "control_flow" }
     },
     {
       "id": "tools_to_sandbox",
@@ -286,7 +294,8 @@
       "fromSide": "bottom",
       "toNode": "sandbox",
       "toSide": "top",
-      "color": "#2563eb"
+      "color": "#2563eb",
+      "pv": { "edgeType": "data_flow" }
     },
     {
       "id": "core_to_protocol",
@@ -294,7 +303,8 @@
       "fromSide": "right",
       "toNode": "protocol",
       "toSide": "left",
-      "color": "#2563eb"
+      "color": "#2563eb",
+      "pv": { "edgeType": "data_flow" }
     },
     {
       "id": "protocol_to_mcp_server",
@@ -302,7 +312,8 @@
       "fromSide": "bottom",
       "toNode": "mcp_server",
       "toSide": "top",
-      "color": "#059669"
+      "color": "#059669",
+      "pv": { "edgeType": "event_stream" }
     },
     {
       "id": "protocol_to_app_server",
@@ -310,7 +321,8 @@
       "fromSide": "bottom",
       "toNode": "app_server",
       "toSide": "top",
-      "color": "#059669"
+      "color": "#059669",
+      "pv": { "edgeType": "event_stream" }
     },
     {
       "id": "mcp_server_to_shell_tool",
@@ -318,7 +330,8 @@
       "fromSide": "bottom",
       "toNode": "shell_tool_mcp",
       "toSide": "top",
-      "color": "#dc2626"
+      "color": "#dc2626",
+      "pv": { "edgeType": "api_call" }
     },
     {
       "id": "core_to_telemetry",
@@ -326,7 +339,8 @@
       "fromSide": "left",
       "toNode": "telemetry",
       "toSide": "right",
-      "color": "#059669"
+      "color": "#059669",
+      "pv": { "edgeType": "event_stream" }
     },
     {
       "id": "model_client_to_core",
@@ -334,7 +348,8 @@
       "fromSide": "bottom",
       "toNode": "core",
       "toSide": "right",
-      "color": "#059669"
+      "color": "#059669",
+      "pv": { "edgeType": "event_stream" }
     }
   ]
 }
